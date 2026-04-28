@@ -1,8 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>FeelSafe SOS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FeelSafe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff4e50, #fc913a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 300px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .save-btn {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .help-btn {
+      background: #ff3b3b;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .help-btn:hover {
+      background: #e60000;
+    }
+
+    .save-btn:hover {
+      background: #3e8e41;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🚨 FeelSafe</h1>
+
+  <input type="text" id="phone" placeholder="Enter emergency number">
+
+  <button class="save-btn" onclick="saveContact()">Save Contact</button>
+
+  <button class="help-btn" onclick="sendHelp()">HELP</button>
+</div>
+
+<!-- Firebase Scripts -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -19,125 +99,31 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-</script>
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-    text-align: center;
-}
-
-h1 {
-    margin-top: 30px;
-}
-
-.sos-btn {
-    margin-top: 80px;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: red;
-    color: white;
-    font-size: 30px;
-    border: none;
-    box-shadow: 0 0 30px red;
-}
-
-.sos-btn:active {
-    transform: scale(0.9);
-}
-
-.actions {
-    margin-top: 40px;
-}
-
-a {
-    display: block;
-    margin: 10px;
-    padding: 15px;
-    background: #1e293b;
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<h1>🚨 FeelSafe</h1>
-<p>Your safety, one tap away</p>
-
-<button class="sos-btn" onclick="sendSOS()">SOS</button>
-<input id="phone" placeholder="Enter emergency number">
-<button onclick="saveContact()">Save</button>
-<div class="actions">
-    <a href="tel:112">📞 Call Emergency (112)</a>
-</div>
-<button onclick="sendHelp()">HELP</button>
-
-<script>
-function sendHelp() {
-  db.collection("contacts").doc("user1").get()
-    .then((doc) => {
-      if (doc.exists) {
-        const phone = doc.data().phone;
-
-        const message = "🚨 I need help! Please contact me immediately.";
-        const url = "https://wa.me/91" + phone + "?text=" + encodeURIComponent(message);
-
-        window.open(url, "_blank");
-      } else {
-        alert("No contact saved!");
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-}
-</script>
-<script>
-function sendSOS() {
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(pos) {
-
-            let lat = pos.coords.latitude;
-            let lon = pos.coords.longitude;
-
-            let locationLink = `https://maps.google.com/?q=${lat},${lon}`;
-
-            let message = `🚨 HELP! I am in danger.\nMy location: ${locationLink}`;
-
-            // Open WhatsApp with message
-            window.location.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
-
-        }, function() {
-            alert("Location access denied. Please enable GPS.");
-        });
-    } else {
-        alert("Geolocation not supported.");
-    }
-}
-
-
 function saveContact() {
   const phone = document.getElementById("phone").value;
 
   db.collection("contacts").doc("user1").set({
     phone: phone
   })
-  .then(() => {
-    alert("Contact saved!");
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-  });
+  .then(() => alert("Contact saved!"))
+  .catch((error) => console.error(error));
 }
 
+function sendHelp() {
+  db.collection("contacts").doc("user1").get()
+    .then((doc) => {
+      if (doc.exists) {
+        const phone = doc.data().phone;
+        const message = "🚨 I need help! Please reach me.";
 
+        const url = "https://wa.me/91" + phone + "?text=" + encodeURIComponent(message);
+        window.open(url, "_blank");
+      } else {
+        alert("No contact saved!");
+      }
+    })
+    .catch((error) => console.error(error));
+}
 </script>
 
 </body>
