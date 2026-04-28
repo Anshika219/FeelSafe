@@ -99,48 +99,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+
 function saveContact() {
   const phone = document.getElementById("phone").value;
-
-  db.collection("contacts").doc("user1").set({
-    phone: phone
-  })
-  .then(() => alert("Contact saved!"))
-  .catch((error) => console.error(error));
+  localStorage.setItem("emergencyContact", phone);
+  alert("Contact saved!");
 }
 
-
 function sendHelp() {
+  const phone = localStorage.getItem("emergencyContact");
+
+  if (!phone) {
+    alert("No contact saved!");
+    return;
+  }
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position) => {
-      
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
 
       const locationLink = "https://maps.google.com/?q=" + lat + "," + lon;
+      const message = "🚨 EMERGENCY! I need help.\nLocation: " + locationLink;
 
-      db.collection("contacts").doc("user1").get()
-        .then((doc) => {
-          if (doc.exists) {
-            const phone = doc.data().phone;
-
-            const message = "🚨 EMERGENCY! I need help.\nMy location: " + locationLink;
-
-            const url = "https://wa.me/91" + phone + "?text=" + encodeURIComponent(message);
-
-            window.open(url, "_blank");
-          } else {
-            alert("No contact saved!");
-          }
-        });
-
-    }, () => {
-      alert("Location access denied!");
+      const url = "https://wa.me/91" + phone + "?text=" + encodeURIComponent(message);
+      window.open(url, "_blank");
     });
-  } else {
-    alert("Geolocation not supported!");
   }
 }
+
 
 </script>
 
