@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SafeHer SOS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<style>
+body {
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+}
+
+button {
+    margin-top: 100px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 30px;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚨 SafeHer</h1>
+<button onclick="sendSOS()">SOS</button>
+
+<script>
+function sendSOS() {
+
+    navigator.geolocation.getCurrentPosition(function(pos) {
+
+        let lat = pos.coords.latitude;
+        let lon = pos.coords.longitude;
+
+        let message = `HELP! I am in danger.\nLocation: https://maps.google.com/?q=${lat},${lon}`;
+
+        // Open WhatsApp with message
+        window.location.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    });
+
+}
+</script>
+
+</body>
+</html>
