@@ -71,7 +71,8 @@ a {
 <p>Your safety, one tap away</p>
 
 <button class="sos-btn" onclick="sendSOS()">SOS</button>
-
+<input id="phone" placeholder="Enter emergency number">
+<button onclick="saveContact()">Save</button>
 <div class="actions">
     <a href="tel:112">📞 Call Emergency (112)</a>
 </div>
@@ -99,6 +100,21 @@ function sendSOS() {
         alert("Geolocation not supported.");
     }
 }
+
+function saveContact() {
+  const phone = document.getElementById("phone").value;
+
+  db.collection("contacts").add({
+    phone: phone
+  })
+  .then(() => {
+    alert("Saved successfully!");
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
+}
+
 </script>
 
 </body>
